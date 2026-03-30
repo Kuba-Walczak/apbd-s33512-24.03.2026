@@ -36,7 +36,7 @@ public sealed class LinqExercises
     {
         return
         [UniversityData.Enrollments
-            .Exists(e => e.IsActive) ? "Yes" : "No"];
+            .Exists(e => !e.IsActive) ? "Yes" : "No"];
     }
     public IEnumerable<string> Task06_DoAllLecturersHaveDepartment()
     {
@@ -53,9 +53,9 @@ public sealed class LinqExercises
     public IEnumerable<string> Task08_DistinctStudentCities()
     {
         return UniversityData.Students
-            .OrderBy(s => s.City)
             .Select(s => s.City)
             .Distinct()
+            .OrderBy(c => c)
             .ToList();
     }
     public IEnumerable<string> Task09_ThreeNewestEnrollments()
@@ -76,7 +76,7 @@ public sealed class LinqExercises
     {
         return UniversityData.Students
             .Join(UniversityData.Enrollments, s => s.Id, e => e.StudentId, (s, e) => new {s, e})
-            .Select(x => $"{x.s.FirstName}, {x.s.LastName}, {x.e.CourseId}")
+            .Select(x => $"{x.s.FirstName}, {x.s.LastName}, {x.e.EnrollmentDate}")
             .ToList();
     }
     public IEnumerable<string> Task12_StudentCoursePairs()
@@ -135,7 +135,7 @@ public sealed class LinqExercises
             .Join(UniversityData.Enrollments, c => c.Id, e => e.CourseId, (c, e) => new { c, e })
             .Where(x => x.c.StartDate.Month == 4 && x.c.StartDate.Year == 2026)
             .GroupBy(x => x.c.Title)
-            .Where(x => x.Any(x => x.e.FinalGrade.HasValue))
+            .Where(x => x.All(x => !x.e.FinalGrade.HasValue))
             .Select(x => x.Key)
             .ToList();
     }
